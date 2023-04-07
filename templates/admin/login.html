@@ -1,0 +1,70 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}
+  {{ block.super }} 
+  login
+{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+  {% if form.errors and not form.non_field_errors %}
+    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+  {% endif %}
+  
+  {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+      {{ error }}
+    {% endfor %}
+  {% endif %}
+  
+  {% if user.is_authenticated %}
+    {% blocktranslate trimmed %}
+      You are authenticated as {{ username }}, but are not authorized to access this page. Would you like to login to a different account?
+    {% endblocktranslate %}
+  {% endif %}
+
+  <form method="post" id="login-form">
+    {% csrf_token %}
+    {{ form.username.errors }}
+    <div class="form-row">
+      <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+      {{ form.username }}
+    </div>
+   
+    {{ form.mobile.errors }}
+    <div class="form-row">
+      <label for="{{ form.mobile.id_for_label }}">Phone</label>
+      <input type="text" name="mobile" id="{{ form.mobile.id_for_label }}" required>
+    </div>
+
+    {{ form.password.errors }}
+    <div class="form-row">
+      <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+      {{ form.password }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{% translate 'Log in' %}</button>
+
+    {% url 'admin_password_reset' as password_reset_url %}
+    {% if password_reset_url %}
+      <a href="{{ password_reset_url }}" class="float-right">{% translate 'Forgotten your password or username?' %}</a>
+    {% endif %}
+  </form>
+
+{% endblock %}
